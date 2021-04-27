@@ -643,7 +643,7 @@ NTSTATUS FakeNtOpenProcess(
 
 	if (g_needProtectObj.uGameProcessID != 0)
 	{
-
+		//排除mytask进程目标进程的操作
 		if (is_inlist(&mmpt_head,(int)targetProcessId) &&
 			currentProcessId != targetProcessId && g_needProtectObj.uGameProcessID != (ULONG)PsGetCurrentProcessId()
 			)
