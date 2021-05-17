@@ -78,6 +78,18 @@
     <ClCompile Include="AntiImm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="DLLcheck.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AntiDebug.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MmProtect.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NamaPipe.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AntiCheateMain.h">
@@ -147,6 +159,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="AntiImm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DLLcheck.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AntiDebug.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MmProtect.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NamaPipe.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

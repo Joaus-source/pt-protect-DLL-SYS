@@ -39,6 +39,7 @@ static NTSTATUS WINAPI MyLdrLoadDll(
 	IN PUNICODE_STRING ModuleFileName,
 	OUT PHANDLE ModuleHandle)
 {
+	//PrintDbgInfo(_T("DLL Load !->%wZ"), ModuleFileName->Buffer);
 	NTSTATUS ntStatus;
 	WCHAR szDllName[MAX_PATH];
 	ZeroMemory(szDllName, sizeof(szDllName));
@@ -52,7 +53,11 @@ static NTSTATUS WINAPI MyLdrLoadDll(
 	{
 		//GetModuleHandleW其实是读取peb的消息,没必要再遍历一遍了
 		HMODULE hNowMod = GetModuleHandleW(szDllName);
-		if (NULL == hNowMod) s_bHidMode = true;
+		if (NULL == hNowMod)
+		{
+			s_bHidMode = true;
+			//PrintDbgInfo(_T("Find DLL clear self!->%wZ"), ModuleFileName->Buffer);
+		}
 	}
 	//恢复错误码
 	SetLastError(dwLastError);
@@ -72,6 +77,7 @@ void MonitorLoadDll()
 	DetourUpdateThread(GetCurrentThread());
 	DetourAttach((PVOID*)&s_fpSrcLdrDll, MyLdrLoadDll);
 	DetourTransactionCommit();
+	PrintDbgInfo(_T("Hook LdrLoadDll"));
 }
 
 

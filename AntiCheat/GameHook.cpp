@@ -7,7 +7,7 @@ fpTypeExitProcess g_fpOldExitProcess = NULL;
 VOID WINAPI MyExitProcess(_In_  UINT uExitCode)
 {
 	PrintDbgInfo(TEXT("MyExitProcess"));
-	UnLoadDriver();
+	//UnLoadDriver();
 	//在进程退出之前做点事情
 	g_fpOldExitProcess(uExitCode);
 }
@@ -20,6 +20,7 @@ VOID OnHookExitProcess()
 	DetourUpdateThread(GetCurrentThread());
 	DetourAttach((PVOID*)&g_fpOldExitProcess, MyExitProcess);
 	DetourTransactionCommit();
+	PrintDbgInfo(_T("On Hook ExitProcess!"));
 }
 
 
@@ -250,7 +251,7 @@ VOID OnHookWnd()
 	//DetourAttach((PVOID*)&g_fpSetWindowsTextW, MySetWindowTextW);
 	//DetourAttach((PVOID*)&g_fpSetWindowsTextA, MySetWindowTextA);
 	DetourTransactionCommit();
-
+	PrintDbgInfo(_T("OnHookWnd"));
 }
 
 

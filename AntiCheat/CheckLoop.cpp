@@ -13,6 +13,10 @@
 #include "FileVersionInfo.h"
 #include "AntiPE.h"
 #include "AntiCreateProcess.h"
+#include "DLLcheck.h"
+#include "AntiDebug.h"
+#include "MmProtect.h"
+#include "NamaPipe.h"
 // Link with the Wintrust.lib file.
 #pragma comment (lib, "wintrust")
 
@@ -167,7 +171,7 @@ LIST_ENTRY *GetHashTableAddress()
 	LIST_ENTRY *retval = NULL;
 	BYTE pSign[] = { 0x83, 0xE0, 0x1F, 0x8D, 0x04, 0xC5 };
 	DWORD SignLen = 6;
-	_tprintf(TEXT("ntdll base:%08x\r\n"), hModule);
+	PrintDbgInfo(TEXT("ntdll base:%08x\r\n"), hModule);
 	__try
 	{
 		DWORD dwAddress = (DWORD)GetProcAddress((HMODULE)hModule, "LdrLoadDll");
@@ -177,7 +181,7 @@ LIST_ENTRY *GetHashTableAddress()
 			if (memcmp((BYTE *)(dwAddress + i), pSign, SignLen) == 0)
 			{
 				p = (BYTE *)((DWORD)dwAddress + i);
-				_tprintf(TEXT("address:%08x\r\n"), p);
+				PrintDbgInfo(TEXT("address:%08x\r\n"), p);
 				p += 6;
 				retval = (LIST_ENTRY *)(*(DWORD *)p);
 				break;
@@ -193,6 +197,7 @@ LIST_ENTRY *GetHashTableAddress()
 
 VOID CheckSelfMoByHashTable(HANDLE hProcess, LIST_ENTRY *LdrpHashTable)
 {
+	PrintDbgInfo(_T("CheckSelfMoByHashTable"));
 	LIST_ENTRY *LdrpHashTableTemp = NULL, *pListEntry, *pListHead;
 	UNICODE_STRING *pDllFullPath;
 	void *pTemp;
@@ -231,6 +236,7 @@ VOID CheckSelfMoByHashTable(HANDLE hProcess, LIST_ENTRY *LdrpHashTable)
 					{
 						TCHAR szFileName[MAX_PATH] = { 0 };
 						GetModuleFileName(NULL, szFileName, _countof(szFileName));
+						
 						if (!VerifyEmbeddedSignature((LPCWSTR)pTemp) && _tcscmp(szFileName, (LPCWSTR)pTemp))
 						{
 							CFileVersionInfo fileV((LPCWSTR)pTemp);
@@ -263,6 +269,7 @@ VOID CheckSelfMoByHashTable(HANDLE hProcess, LIST_ENTRY *LdrpHashTable)
 
 VOID CheckSelfMod()
 {
+	PrintDbgInfo(_T("CheckSelfMod :enter!"));
 	LIST_ENTRY *LdrpHashTable;
 	LdrpHashTable = GetHashTableAddress();
 	if (LdrpHashTable)
@@ -408,28 +415,72 @@ void CheckLsp()
 	GetCurrentProtocolCatalogPath(szCateLogPath, _countof(szCateLogPath));
 	EnumLsp(szCateLogPath);
 }
-
+bool CheckThreadExit = false;
 unsigned int __stdcall CheckLoop(void* pArg)
 {
-
+	PrintDbgInfo(_T("Check Loop enter!"));
 	while (true)
 	{
-		if (IsFondApcInject())
+		if (CheckThreadExit)
 		{
-			ExitProcess(2);
+			PrintDbgInfo(TEXT("Check Loop exit!"));
+			ExitThread(0);
 		}
-		//检测自身模块,并且上传
-		CheckSelfMod();
-		//检测可疑的lsp
-		CheckLsp();
-		//检测dll劫持
-		CheckModPEInfo();
-		//上传劫持模块
-		IsFondHackDll();
-		//父进程不对
-		if (IsSuspendProcess())
+/*
+// 		{
+// 			//检测自身模块,并且上传
+// 			CheckSelfMod();
+// 			//检测可疑的lsp
+// 			CheckLsp();
+// 			//检测dll劫持
+// 			CheckModPEInfo();
+// 			//上传劫持模块
+// 			IsFondHackDll();
+// 		}
+*/
+
+		//静态检测DLL文件的签名和签名公司，检测内存可执行区域
+
+		if (antiinjectstates())
 		{
-			ExitProcess(6);
+			EnumMoudle();
+			if (!check_enummode())
+			{
+				PrintDbgInfo(L"检测到进程被注入");
+			}
+		}
+		
+		if (protectthreadstates())
+		{
+			if (IsFondApcInject())
+			{
+				PrintDbgInfo(TEXT("检测到插入APC"))
+				ExitProcess(2);
+			}
+			if (g_Thread_check)
+			{
+				PrintDbgInfo(_T("检测到恶意线程创建！"));
+			}
+		}
+		//父进程不对
+		if (antidebugstates())
+		{
+			if (IsSuspendProcess())
+			{
+				PrintDbgInfo(_T("检测到进程被调试！"));
+				ExitProcess(6);
+			}
+			if (AntiDebug::AntidebugMain())
+			{
+				PrintDbgInfo(_T("检测到进程被调试！"));
+			}
+		}
+		if (dataprotectstates())
+		{
+			if (!check_crc32())
+			{
+				PrintDbgInfo(_T("检测到内存修改！"));
+			}
 		}
 		Sleep(5000);
 	}
@@ -437,8 +488,16 @@ unsigned int __stdcall CheckLoop(void* pArg)
 }
 
 //对外接口
+unsigned int uThreadID = 0;
 void CheckLoop()
 {
-	unsigned int uThreadID = 0;
+
 	_beginthreadex(0, 0, CheckLoop, 0, 0, &uThreadID);
+}
+
+void CheckLoopStop()
+{
+	HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, 0, uThreadID);
+	TerminateThread(hThread, 0);
+	CheckThreadExit = true;
 }

@@ -31,6 +31,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Static</UseOfMfc>
+    <SpectreMitigation>false</SpectreMitigation>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -84,6 +85,7 @@
     <ClCompile Include="AntiApc.cpp" />
     <ClCompile Include="AntiCheatMain.cpp" />
     <ClCompile Include="AntiCreateProcess.cpp" />
+    <ClCompile Include="AntiDebug.cpp" />
     <ClCompile Include="AntiHideLib.cpp" />
     <ClCompile Include="AntiImm.cpp" />
     <ClCompile Include="AntiOpenMore.cpp" />
@@ -92,6 +94,7 @@
     <ClCompile Include="CheckLoop.cpp" />
     <ClCompile Include="Crypto.cpp" />
     <ClCompile Include="Dbg.cpp" />
+    <ClCompile Include="DLLcheck.cpp" />
     <ClCompile Include="DllEntry.cpp" />
     <ClCompile Include="DriverOperation.cpp" />
     <ClCompile Include="FileVersionInfo.cpp" />
@@ -99,6 +102,8 @@
     <ClCompile Include="HideHook.cpp" />
     <ClCompile Include="GameHook.cpp" />
     <ClCompile Include="CheatMsg.c" />
+    <ClCompile Include="MmProtect.cpp" />
+    <ClCompile Include="NamaPipe.cpp" />
     <ClCompile Include="PEOperation.cpp" />
     <ClCompile Include="ProcessOperation.cpp" />
     <ClCompile Include="Router.cpp" />
@@ -108,6 +113,7 @@
     <ClInclude Include="AntiCheateMain.h" />
     <ClInclude Include="AntiCheat.h" />
     <ClInclude Include="AntiCreateProcess.h" />
+    <ClInclude Include="AntiDebug.h" />
     <ClInclude Include="AntiHideLib.h" />
     <ClInclude Include="AntiImm.h" />
     <ClInclude Include="AntiOpenMore.h" />
@@ -116,6 +122,7 @@
     <ClInclude Include="CheckLoop.h" />
     <ClInclude Include="Crypto.h" />
     <ClInclude Include="Dbg.h" />
+    <ClInclude Include="DLLcheck.h" />
     <ClInclude Include="DllEntry.h" />
     <ClInclude Include="DriverOperation.h" />
     <ClInclude Include="FileVersionInfo.h" />
@@ -123,6 +130,8 @@
     <ClInclude Include="HideHook.h" />
     <ClInclude Include="GameHook.h" />
     <ClInclude Include="CheatMsg.h" />
+    <ClInclude Include="MmProtect.h" />
+    <ClInclude Include="NamaPipe.h" />
     <ClInclude Include="PEOperation.h" />
     <ClInclude Include="ProcessOperation.h" />
     <ClInclude Include="Router.h" />

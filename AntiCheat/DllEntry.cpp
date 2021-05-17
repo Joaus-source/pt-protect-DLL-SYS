@@ -21,10 +21,11 @@ BOOL APIENTRY DllMain(
 	case DLL_THREAD_ATTACH:
 		break;
 	case DLL_THREAD_DETACH:
-		UnLoadDriver();
+		//UnLoadDriver();
 		break;
 	case DLL_PROCESS_DETACH:
-		UnLoadDriver();
+		//UnLoadDriver();
+		ReleaseMain();
 		break;
 	}
 	return TRUE;

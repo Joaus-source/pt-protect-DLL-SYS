@@ -61,4 +61,5 @@ void MonitorImme()
 	DetourAttach((PVOID*)&s_fpGetHotKey, MyImmGetHotKey);
 	DetourAttach((PVOID*)&s_fpImmActivateLayout, MyImmActivateLayout);
 	DetourTransactionCommit();
+	PrintDbgInfo(_T("Hook Imme inject"));
 }

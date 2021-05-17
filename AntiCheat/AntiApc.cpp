@@ -91,6 +91,7 @@ int WINAPI MyRtlDispatchAPC(
 	if (!s_bQueryApcFlag)
 	{
 		s_bFondApcInject = true;
+		PrintDbgInfo(_T("Find APC Inject!"));
 	}
 	s_bQueryApcFlag = false;
 	return s_fpRtlDispatchAPC(uknow1, uknow2, Context);
@@ -112,8 +113,17 @@ void MonitorApc()
 	DetourAttach((PVOID*)&s_fpNtQueueApcThread, MyNtQueueApcThread);
 	DetourAttach((PVOID*)&s_fpRtlDispatchAPC, MyRtlDispatchAPC);
 	DetourTransactionCommit();
+	PrintDbgInfo(_T("Hook APC Inject!"));
 }
+void ResumeAPCHOOK()
+{
+	DetourUpdateThread(GetCurrentThread());
+	DetourDetach((PVOID*)&s_fpNtQueueApcThread, MyNtQueueApcThread);
+	DetourDetach((PVOID*)&s_fpRtlDispatchAPC, MyRtlDispatchAPC);
 
+	DWORD nErr = DetourTransactionCommit();
+	PrintDbgInfo(_T("Hook APC Resume!"));
+}
 bool IsFondApcInject()
 {
 	return s_bFondApcInject;
